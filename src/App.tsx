@@ -2,6 +2,7 @@ import React from "react";
 import { EuiProvider } from "@elastic/eui";
 import Login from './sub-component/login';
 import SignUp from "./sub-component/signup";
+import HomePage from "./complex-component/homepage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App (){
@@ -11,6 +12,7 @@ function App (){
     <Routes>           
        <Route path="/" element = {<SignUp/>}></Route> 
        <Route path="/login" element = {<Login/>}></Route>   
+       <Route path="/home" element = {<HomePage/>}> </Route>
     </Routes>
     </Router>
      </EuiProvider>

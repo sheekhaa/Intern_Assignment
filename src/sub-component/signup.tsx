@@ -35,6 +35,13 @@ const SignUp:React.FC = () =>{
 
   return(
     <>
+   
+    <EuiFlexItem className="header">  
+    <EuiFlexGroup className="sign-up">
+      <EuiFlexItem>
+        <EuiText>Sign Up</EuiText>
+      </EuiFlexItem>
+    </EuiFlexGroup>
     <EuiFlexGroup>
       <EuiFlexItem grow = {false}>
         <EuiText>Name:</EuiText>
@@ -74,7 +81,9 @@ const SignUp:React.FC = () =>{
       <EuiFlexItem grow = {false}>
         <EuiButton onClick={handleSignup}>Signup</EuiButton>
       </EuiFlexItem>      
-    </EuiFlexGroup>    
+    </EuiFlexGroup>  
+    </EuiFlexItem>  
+    
     </>
   )
 }
