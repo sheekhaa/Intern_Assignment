@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useGetBooksQuery } from "../services/bookApi";
+import { useGetBooksQuery, useUpdateBookMutation, useDeleteBookMutation } from "../services/bookApi";
 import { Book } from "../services/bookApi";
-import { Criteria, EuiBasicTable, EuiBasicTableColumn, EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiText, EuiPopover, EuiIcon, EuiButtonEmpty,  } from "@elastic/eui";
+import { Criteria, EuiBasicTable, EuiBasicTableColumn, EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiText, EuiPopover, EuiIcon, EuiButtonEmpty, useGeneratedHtmlId, EuiFlyout, EuiFlyoutHeader, EuiTitle, EuiFlyoutBody, EuiFieldText, EuiFlyoutFooter, EuiConfirmModal,  } from "@elastic/eui";
 
 
 const HomePage: React.FC = () =>{
@@ -12,6 +12,49 @@ const HomePage: React.FC = () =>{
   const [pageSize, SetPageSize] = useState(4);
   const [searchTerm, setSearchTerm] = useState(""); //for search
   const [openPopoverId, setOpenPopoverId] = useState<number | null>(null); //for action
+  //for flyout
+  const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
+  const [editFlyout, setEditFlyout] = useState<Book | null>(null);
+  const [isModalVisible, setIsModalVisible] =useState(false);
+  const [deleteModal, setDeleteModal] = useState <Book | null>(null);
+  const [updateBook] = useUpdateBookMutation();
+  const [deleteBook] = useDeleteBookMutation();
+
+
+  //for modal
+  const closeModal = ()=> {
+    setDeleteModal(null);
+    setIsModalVisible(false);
+  }
+  const showModal = (book: Book) => {
+    setDeleteModal(book);
+    setIsModalVisible(true)
+  }
+  const modalTitleId = useGeneratedHtmlId();
+  const handleDeleteModal =async () =>{
+    if(deleteModal){
+      try{
+        await deleteBook(deleteModal.id).unwrap();
+        closeModal();        
+      }catch(error){
+        console.error("Failed delete book", error);
+      }
+    }
+  }
+
+  //handle edit flyout
+  const handleEdit = async() =>{
+    if(editFlyout){
+      try{
+        await updateBook(editFlyout).unwrap();
+        setIsFlyoutVisible(false);
+        setEditFlyout(null);
+      }catch(error){
+        console.error("Failed to update book", error);
+      }      
+    }
+  };
+  
 
   const onTableChange = ({page}: Criteria<Book>)=>{
     if (page){
@@ -50,6 +93,8 @@ const HomePage: React.FC = () =>{
     totalItemCount,
     pageSizeOptions: [4,8, 12],
   }
+
+  
  
 
   const columns: Array<EuiBasicTableColumn<Book>> = [
@@ -108,10 +153,12 @@ const HomePage: React.FC = () =>{
             <EuiButtonEmpty
               iconType="pencil"
               onClick={() => {
+                setEditFlyout(item);
+                setIsFlyoutVisible(true);
+
                 // handleEdit(item);
                 closePopover();
-              }}
-            >
+              }}            >
               Edit
             </EuiButtonEmpty>
           </EuiFlexItem>
@@ -120,7 +167,7 @@ const HomePage: React.FC = () =>{
               iconType="trash"
               color="danger"
               onClick={() => {
-                // showModal(item.id);
+                showModal(item);
                 closePopover();
               }}
             >
@@ -132,9 +179,99 @@ const HomePage: React.FC = () =>{
     );
   }
 }
- 
-
   ]
+
+  //flyout handle
+  const simpleFlyoutTitled = useGeneratedHtmlId();
+
+  let flyout;
+  if(isFlyoutVisible && editFlyout){
+    flyout = (
+      <EuiFlyout 
+      ownFocus
+      onClose={()=>{ setIsFlyoutVisible(false);
+        setEditFlyout(null);
+      }}
+      aria-labelledby={simpleFlyoutTitled}
+      size="s">
+        <EuiFlyoutHeader hasBorder>
+          <EuiTitle size="s">
+            <h2 id = {simpleFlyoutTitled}>A Edit Details</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiText>Title:   
+              </EuiText>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiFieldText value={editFlyout.title} onChange={(e)=> setEditFlyout({...editFlyout, title:e.target.value})}/>
+            </EuiFlexItem>
+          </EuiFlexGroup>  
+
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiText>Author:
+              </EuiText>
+            </EuiFlexItem>  
+            <EuiFlexItem>
+              <EuiFieldText value={editFlyout.author} onChange={(e)=> setEditFlyout({...editFlyout, author: e.target.value})}/>
+            </EuiFlexItem>
+          </EuiFlexGroup>   
+
+           <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiText> Year:
+              </EuiText>
+            </EuiFlexItem>  
+            <EuiFlexItem>
+              <EuiFieldText value={editFlyout.year} onChange={(e)=>setEditFlyout({...editFlyout, year: parseInt(e.target.value)})}/>
+            </EuiFlexItem>
+          </EuiFlexGroup>    
+
+           <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiText>Quantitiy:
+              </EuiText>
+            </EuiFlexItem>  
+            <EuiFlexItem>
+              <EuiFieldText value={editFlyout.quantity} onChange={(e)=> setEditFlyout({...editFlyout, quantity:parseInt(e.target.value)})}/>
+            </EuiFlexItem>
+          </EuiFlexGroup>   
+
+           <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiText>Price:
+              </EuiText>
+            </EuiFlexItem>  
+            <EuiFlexItem>
+              <EuiFieldText value={editFlyout.price} onChange={(e)=> setEditFlyout({...editFlyout, price:parseFloat(e.target.value)})}/>
+            </EuiFlexItem>
+          </EuiFlexGroup>   
+        </EuiFlyoutBody>
+
+        <EuiFlyoutFooter>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiButton onClick={()=>{
+                setIsFlyoutVisible(false);
+                setEditFlyout(null);
+              }}>
+                Close
+              </EuiButton>
+            </EuiFlexItem>
+
+            <EuiFlexItem>
+              <EuiButton onClick={handleEdit}>
+                Update
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutFooter>
+      </EuiFlyout>
+    );
+  }
    
   return(
     <>
@@ -165,10 +302,26 @@ const HomePage: React.FC = () =>{
         columns={columns}
         pagination={pagination}
         onChange={onTableChange}
-        loading = {isLoading}/>   
-        
-      </EuiFlexItem>
+        loading = {isLoading}/>           
+      </EuiFlexItem>        
     </EuiFlexGroup>
+
+    {isModalVisible &&(
+      <EuiConfirmModal
+      aria-labelledby={modalTitleId}
+      style={{width:600}}
+      title = "Are you sure want to delete this book's details?"
+      titleProps={{id: modalTitleId}}
+      onCancel={closeModal}
+      onConfirm={handleDeleteModal}
+      cancelButtonText = "Cancel"
+      confirmButtonText = "Delete"
+      defaultFocusedButton="confirm"
+      buttonColor="danger"
+      > 
+      <p>This will permantantly delete the book's details.</p></EuiConfirmModal>
+    )}
+    {flyout}
     </>
   )
 }

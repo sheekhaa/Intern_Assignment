@@ -7,6 +7,15 @@ const Login: React.FC=()=>{
   const[password, setPassword] = useState('');
   const [AddLogin] = useAddDataMutation();
 
+  const handleLogin = async()=>{
+    try{
+      const response = await AddLogin({username, password}).unwrap();
+      localStorage.setItem('token', response.token)//store token
+    }catch (err){
+      console.error("Login failed", err);
+    }
+  }
+
 
     const handleSubmit = async(e: React.FormEvent) =>{
     e.preventDefault();
