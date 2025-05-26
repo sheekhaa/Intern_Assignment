@@ -1,10 +1,30 @@
-.header ,css-9sbomz-euiFlexItem-grow-1{  
+.signup-container ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
+  min-height: 75vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center;  
 }
 
-
-.sign-up ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
-  margin: 100px 50px 0 50px  ; 
+.signup-box ,css-9sbomz-euiFlexItem-grow-1{  
+  padding: 30px;
+  border-radius: 4px;
+  background-color: #fff;
+  max-width: 500px; 
+  margin: 0 auto;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.15) ;
+  border-color: transparent;  
 }
+.font.css-1n6n1v5-euiText-m{
+  margin-bottom: 20px;
+  text-align: center;
+  margin: 100px 50px 0 50px;  
+  font-weight: bold;
+}
+.form-group ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
+ 
+}
+
+.button.css-aqnt06-euiButtonDisplay-m-defaultMinWidth-base-primary{
+  margin: 0 0 0 20px;  
+}
+

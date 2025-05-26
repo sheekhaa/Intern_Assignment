@@ -1,20 +1,22 @@
 import React, { useState } from "react";
 import { EuiFlexGroup, EuiFlexItem, EuiText, EuiFieldText, EuiButton } from "@elastic/eui";
 import { useAddDataMutation } from "../services/loginService";
+import { useNavigate} from "react-router-dom";
 const Login: React.FC=()=>{
 
   const [username, setUsername] = useState('');
   const[password, setPassword] = useState('');
   const [AddLogin] = useAddDataMutation();
+  const navigate = useNavigate(); 
 
-  const handleLogin = async()=>{
-    try{
-      const response = await AddLogin({username, password}).unwrap();
-      localStorage.setItem('token', response.token)//store token
-    }catch (err){
-      console.error("Login failed", err);
-    }
-  }
+  // const handleLogin = async()=>{
+  //   try{
+  //     const response = await AddLogin({username, password}).unwrap();
+  //     localStorage.setItem('token', response.token)//store token
+  //   }catch (err){
+  //     console.error("Login failed", err);
+  //   }
+  // }
 
 
     const handleSubmit = async(e: React.FormEvent) =>{
@@ -27,8 +29,10 @@ const Login: React.FC=()=>{
       };
       const response = await AddLogin(userData).unwrap();
       console.log("Login successfully", response);
+      localStorage.setItem("token", response.token);
       setUsername('');
       setPassword('');  
+      navigate('/home');
     }catch(error){
       console.log("Login failed.", error);
     }   

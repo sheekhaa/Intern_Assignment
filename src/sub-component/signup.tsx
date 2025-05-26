@@ -35,14 +35,16 @@ const SignUp:React.FC = () =>{
 
   return(
     <>
-   
-    <EuiFlexItem className="header">  
-    <EuiFlexGroup className="sign-up">
-      <EuiFlexItem>
-        <EuiText>Sign Up</EuiText>
+   <EuiFlexGroup className="signup-container">
+    <EuiFlexItem className="signup-box">  
+      
+    <EuiFlexGroup justifyContent="center">
+      <EuiFlexItem grow = {false}>
+        <EuiText className="font">Sign Up</EuiText>
       </EuiFlexItem>
     </EuiFlexGroup>
-    <EuiFlexGroup>
+
+    <EuiFlexGroup className="form-group" >
       <EuiFlexItem grow = {false}>
         <EuiText>Name:</EuiText>
       </EuiFlexItem>
@@ -79,10 +81,11 @@ const SignUp:React.FC = () =>{
 
     <EuiFlexGroup>
       <EuiFlexItem grow = {false}>
-        <EuiButton onClick={handleSignup}>Signup</EuiButton>
+        <EuiButton className="button" onClick={handleSignup}>Signup</EuiButton>
       </EuiFlexItem>      
     </EuiFlexGroup>  
     </EuiFlexItem>  
+    </EuiFlexGroup>
     
     </>
   )

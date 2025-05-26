@@ -11,19 +11,34 @@ export interface Book{
 
 const bookApi = createApi({
   reducerPath: 'bookApi',
-  baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:3000'}),
+  baseQuery: fetchBaseQuery
+    ({baseUrl: 'http://localhost:3000',
+      prepareHeaders: (headers)=>{
+        const token = localStorage.getItem('token');
+        if(token){
+          headers.set('Authorization', `Bearer ${token}`);
+        }
+        return headers;
+      }
+    }),
  
   endpoints: (build)=>({
     getBooks: build.query<Book[], string | void>({
       query: (searchTerm)=>
-        searchTerm ? `books?search=${searchTerm}` : 'books', 
+        searchTerm ? `search?query=${searchTerm}` : 'books', 
     }),
 
     updateBook: build.mutation<Book, Book>({
       query: (book)=>({
         url: `books/${book.id}`,
         method: 'PUT',
-        body: book,
+        body: {
+          title: book.title,
+          author: book.author,
+          year: book.year,
+          quantity: book.quantity,
+          price: book.price
+        }
       }),
     }),
 
@@ -31,11 +46,31 @@ const bookApi = createApi({
       query: (id)=> ({
         url: `books/${id}`,
         method: 'DELETE',
-      }),
-      
+      }),      
     }),
+
+    createBook: build.mutation<Book, Omit<Book, 'id'>>({
+      query: (book)=>({
+        url: '/books',
+        method: 'POST',
+        body: book,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+    }),
+    buyBook: build.mutation<any,{ items: Array<{bookId: number; quantity: number}>}>({
+      query: (body)=> ({
+        url: '/buy',
+        method: 'POST',        
+        body,
+        headers: {Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      })
+    })
+
   }),
 });
-export const {useGetBooksQuery, useUpdateBookMutation, useDeleteBookMutation} = bookApi;
+export const {useGetBooksQuery, useUpdateBookMutation, useDeleteBookMutation, useCreateBookMutation, useBuyBookMutation} = bookApi;
 
 export default bookApi;
