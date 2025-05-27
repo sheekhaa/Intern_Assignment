@@ -15,7 +15,7 @@ export const CommomButton:React.FC<CommonButtonProps>=({
 
 })=>{
   return(
-    <div className="common-filterButton">
+    <div className="common-Button">
       <EuiButton color={color} onClick={onClick} type= {type} >{title}</EuiButton>
     </div>
   )

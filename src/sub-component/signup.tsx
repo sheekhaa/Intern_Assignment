@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { EuiFlexGroup, EuiFlexItem, EuiText, EuiFieldText, EuiButton, EuiLink } from "@elastic/eui";
+import { EuiFlexGroup, EuiFlexItem, EuiText,  EuiLink } from "@elastic/eui";
 import { useNavigate } from "react-router-dom";
 import { useAddDataMutation } from "../services/signupService";
+import { CommomButton } from "./button/commonButton";
+import { CommonFieldText } from "./fieldtext/commonFieldText";
+
 
 const SignUp:React.FC = () =>{
   const [username, setUsername] = useState(''); 
@@ -49,7 +52,7 @@ const SignUp:React.FC = () =>{
         <EuiText>Name:</EuiText>
       </EuiFlexItem>
       <EuiFlexItem>
-        <EuiFieldText placeholder="Enter Username" value={username} onChange={(e)=> setUsername(e.target.value)}></EuiFieldText>
+        <CommonFieldText placeholder="Enter Username" value={username} onChange={(e: { target: { value: React.SetStateAction<string>; }; })=> setUsername(e.target.value)}/>
       </EuiFlexItem>
     </EuiFlexGroup>
 
@@ -58,7 +61,7 @@ const SignUp:React.FC = () =>{
         <EuiText>Email:</EuiText>
       </EuiFlexItem>
       <EuiFlexItem>
-        <EuiFieldText placeholder="Enter email" value={email} onChange={(e)=> setEmail(e.target.value)}></EuiFieldText>
+        <CommonFieldText placeholder="Enter email" value={email} onChange={(e: { target: { value: React.SetStateAction<string>; }; })=> setEmail(e.target.value)}/>
       </EuiFlexItem>
     </EuiFlexGroup>
 
@@ -67,7 +70,7 @@ const SignUp:React.FC = () =>{
         <EuiText>Password:</EuiText>
       </EuiFlexItem>
       <EuiFlexItem>
-        <EuiFieldText placeholder="Enter password" value={password} onChange={(e)=> setPassword(e.target.value)} required></EuiFieldText>
+        <CommonFieldText placeholder="Enter password" value={password} onChange={(e: { target: { value: React.SetStateAction<string>; }; })=> setPassword(e.target.value)} />
       </EuiFlexItem>
     </EuiFlexGroup>
 
@@ -81,7 +84,7 @@ const SignUp:React.FC = () =>{
 
     <EuiFlexGroup>
       <EuiFlexItem grow = {false}>
-        <EuiButton className="button" onClick={handleSignup}>Signup</EuiButton>
+        <CommomButton  title="Signup" onClick={handleSignup}/>
       </EuiFlexItem>      
     </EuiFlexGroup>  
     </EuiFlexItem>  

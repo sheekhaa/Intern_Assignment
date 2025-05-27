@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useGetBooksQuery, useUpdateBookMutation, useDeleteBookMutation, useCreateBookMutation, useBuyBookMutation } from "../services/bookApi";
 import { Book } from "../services/bookApi";
-import { Criteria, EuiBasicTable, EuiBasicTableColumn, EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiText, EuiPopover, EuiIcon, EuiButtonEmpty, useGeneratedHtmlId, EuiFlyout, EuiFlyoutHeader, EuiTitle, EuiFlyoutBody, EuiFieldText, EuiFlyoutFooter, EuiConfirmModal, EuiGlobalToastList } from "@elastic/eui";
+import { Criteria, EuiBasicTableColumn,  EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiText, EuiPopover, EuiIcon, EuiButtonEmpty, useGeneratedHtmlId,  EuiFlyoutHeader, EuiTitle, EuiFlyoutBody, EuiFlyoutFooter, EuiBadge, EuiHeaderSectionItemButton} from "@elastic/eui";
 import { CommomButton } from "../sub-component/button/commonButton";
-import { title } from "process";
+import { CommonFieldText } from "../sub-component/fieldtext/commonFieldText";
+import { CommonTable } from "../sub-component/table/commonTable";
+import { CommonFlyout } from "../sub-component/flyout/commonFlyout";
+import { CommonModal } from "../sub-component/modal/commonModal";
+import { CommonToast } from "../sub-component/toast/commonToast";
+import { useDispatch,useSelector  } from "react-redux";
+import { RootState } from "../Store";
+import { addToCart } from "../slices/cart/cartSlice";
+import { MyToast } from "../sub-component/toast/commonToast";
 
 
 
@@ -29,12 +37,19 @@ const HomePage: React.FC = () =>{
   const [bookTobuy, setBookTobuy] = useState<Book | null>(null);
   
   //for toasts
-  const [toasts, setToasts] = useState<any[]>([]);
+  const [toasts, setToasts] = useState<MyToast[]>([]);
 
   const [updateBook] = useUpdateBookMutation();
   const [deleteBook] = useDeleteBookMutation();
   const [createBook] = useCreateBookMutation();
   const [buyBooks] = useBuyBookMutation();
+  
+  //for cart
+  const [isCartModalVisible, setIsCartModalVisible] = useState(false);
+const cartItems = useSelector((state: RootState) => state.cart.items);
+const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  
   //for addbookflyout
   const [addBookFlyoutVisible, setAddBookFlyoutVisible] = useState(false);
   const [editAddBook, setEditAddBook] = useState<Book>({
@@ -59,24 +74,31 @@ const HomePage: React.FC = () =>{
   const {data: books = [], isLoading} = useGetBooksQuery(debouncedSearchTerm);
 
  //for toasts
- const addToast = (title: string, color: string = 'success')=>{
+const addToast = (title: string, color: 'success' | 'danger' | 'warning' | 'primary' = 'success') => {
   const id = `${Date.now()}`;
-  setToasts((prev)=>[
+  setToasts((prev) => [
     ...prev,
     {
       id,
       title,
       color,
-      iconType: color === 'success' ? 'check' : 'alert',  
-    }
+      iconType: color === 'success' ? 'check' : 'alert',
+    },
   ]);
- };
+};
 
- const removeToast = (removedToast: any)=>{
-  setToasts((prevToasts)=>prevToasts.filter((toast)=> toast.id !== removedToast.id)
-);
- };
- 
+const removeToast = (removedToast: MyToast) => {
+  setToasts((prevToasts) =>
+    prevToasts.filter((toast) => toast.id !== removedToast.id)
+  );
+};
+ //for add cart related state
+ const dispatch = useDispatch(); 
+const onAddToCart = (book: any) => {
+  dispatch(addToCart(book));
+  addToast(`${book.title} added to cart`, 'success');
+};
+
 
   //for buy modal
   const closeBuyModal = () =>{
@@ -96,6 +118,7 @@ const HomePage: React.FC = () =>{
       }
     }
   };
+
   //for modal
   const closeModal = ()=> {
     setDeleteModal(null);
@@ -276,8 +299,12 @@ const HomePage: React.FC = () =>{
 
               <EuiFlexItem>
             <EuiButtonEmpty
-              iconType="shoppingCart"              
-              color="primary"                     
+              iconType="plusInCircle"              
+              color="primary"     
+              onClick={()=>{
+                onAddToCart(item);
+                closePopover();
+              }}                
             >
               Add to Cart
             </EuiButtonEmpty>
@@ -296,7 +323,7 @@ const HomePage: React.FC = () =>{
   let flyout;
   if(isFlyoutVisible && editFlyout){
     flyout = (
-      <EuiFlyout 
+      <CommonFlyout 
       ownFocus
       onClose={()=>{ setIsFlyoutVisible(false);
         setEditFlyout(null);
@@ -315,7 +342,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiFieldText value={editFlyout.title} onChange={(e)=> setEditFlyout({...editFlyout, title:e.target.value})}/>
+              <CommonFieldText value={editFlyout.title} onChange={(e: { target: { value: any; }; })=> setEditFlyout({...editFlyout, title:e.target.value})}/>
             </EuiFlexItem>
           </EuiFlexGroup>  
 
@@ -325,7 +352,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editFlyout.author} onChange={(e)=> setEditFlyout({...editFlyout, author: e.target.value})}/>
+              <CommonFieldText value={editFlyout.author} onChange={(e: { target: { value: any; }; })=> setEditFlyout({...editFlyout, author: e.target.value})}/>
             </EuiFlexItem>
           </EuiFlexGroup>   
 
@@ -335,7 +362,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editFlyout.year} onChange={(e)=>setEditFlyout({...editFlyout, year: parseInt(e.target.value)})}/>
+              <CommonFieldText value={editFlyout.year} onChange={(e: { target: { value: string; }; })=>setEditFlyout({...editFlyout, year: parseInt(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup>    
 
@@ -345,7 +372,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editFlyout.quantity} onChange={(e)=> setEditFlyout({...editFlyout, quantity:parseInt(e.target.value)})}/>
+              <CommonFieldText value={editFlyout.quantity} onChange={(e: { target: { value: string; }; })=> setEditFlyout({...editFlyout, quantity:parseInt(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup>   
 
@@ -355,7 +382,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editFlyout.price} onChange={(e)=> setEditFlyout({...editFlyout, price:parseFloat(e.target.value)})}/>
+              <CommonFieldText value={editFlyout.price} onChange={(e: { target: { value: string; }; })=> setEditFlyout({...editFlyout, price:parseFloat(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup>   
         </EuiFlyoutBody>
@@ -379,17 +406,17 @@ const HomePage: React.FC = () =>{
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlyoutFooter>
-      </EuiFlyout>
+      </CommonFlyout>
     );
   }
 
   //flyout for add book
   const addBookFlyout =  addBookFlyoutVisible && (
-    <EuiFlyout
+    <CommonFlyout
     ownFocus
     onClose={()=> setAddBookFlyoutVisible(false)}
     size= "s"
-    aria-labelledby="addBookFlyoutTitle">
+    arialabelledby="addBookFlyoutTitle">
       <EuiFlyoutHeader  hasBorder>
         <EuiTitle size="s">
           <h2 id="addBookFlyoutTitle"> Add new Book</h2>
@@ -402,7 +429,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editAddBook.title} onChange={(e)=> setEditAddBook({...editAddBook, title:(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.title} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, title:(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -412,7 +439,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editAddBook.author} onChange={(e)=> setEditAddBook({...editAddBook, author:(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.author} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, author:(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -422,7 +449,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editAddBook.year} onChange={(e)=> setEditAddBook({...editAddBook, year:parseInt(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.year} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, year:parseInt(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -432,7 +459,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editAddBook.quantity} onChange={(e)=> setEditAddBook({...editAddBook, quantity: parseInt(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.quantity} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, quantity: parseInt(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -442,7 +469,7 @@ const HomePage: React.FC = () =>{
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <EuiFieldText value={editAddBook.price} onChange={(e)=> setEditAddBook({...editAddBook, price:parseFloat(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.price} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, price:parseFloat(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup>        
       </EuiFlyoutBody>
@@ -450,11 +477,13 @@ const HomePage: React.FC = () =>{
       <EuiFlyoutFooter>
          <EuiFlexGroup>
            <EuiFlexItem>
-            <EuiButton onClick={()=> setAddBookFlyoutVisible(false)}>cancel</EuiButton>
+            <CommomButton title="cancel" onClick={()=> setAddBookFlyoutVisible(false)} />
+
+              
            </EuiFlexItem> 
            
            <EuiFlexItem >
-            <EuiButton             
+            <CommomButton title="Add"             
             onClick={async()=>{
               try{
                 await createBook(editAddBook).unwrap();
@@ -463,14 +492,13 @@ const HomePage: React.FC = () =>{
               }catch(error){
                 console.error("Failed to create book", error);
               }
-            }}>
-              Add</EuiButton>
+            }}/>
+              
 
            </EuiFlexItem>
          </EuiFlexGroup> 
       </EuiFlyoutFooter>
-
-    </EuiFlyout>
+    </CommonFlyout>
   )
    
   return(
@@ -485,31 +513,29 @@ const HomePage: React.FC = () =>{
       <EuiFlexItem>
         <EuiFieldSearch placeholder="Search book" value={searchTerm}onChange={(e)=>{
           setSearchTerm(e.target.value);
-          setPageIndex(0); //reset first page on new search
+          setPageIndex(0);//reset first page on new search
         }}isClearable></EuiFieldSearch>
       </EuiFlexItem>
-      <EuiFlexItem>
-        {/* <EuiButton onClick={()=> alert("Search handle automatically")}>Search</EuiButton>         */}
+      <EuiFlexItem grow = {true}>
+         <EuiHeaderSectionItemButton onClick={() => setIsCartModalVisible(true)}>
+      <EuiIcon type="shopping-cart" />
+      {totalCount > 0 && (
+        <EuiBadge color="accent" style={{ marginLeft: "5px" }}>
+          {totalCount}
+        </EuiBadge>
+      )}
+    </EuiHeaderSectionItemButton>
+       
       </EuiFlexItem>
       <EuiFlexItem>
-        {/* <EuiButton onClick={()=>{
-          setEditAddBook({
-            id: 0,
-            title: "",
-            author: "",
-            year: new Date().getFullYear(),
-            quantity: 0,
-            price: 0 
-          });
-          setAddBookFlyoutVisible(true);
-        }}>Add</EuiButton> */}
-        <EuiButton onClick={()=>setAddBookFlyoutVisible(true)}>Add</EuiButton>
+        
+        <CommomButton title="Add" onClick={()=>setAddBookFlyoutVisible(true)}/>
       </EuiFlexItem>
     </EuiFlexGroup>    
 
     <EuiFlexGroup>
       <EuiFlexItem>
-        <EuiBasicTable items={pageOfItems}        
+        <CommonTable items={pageOfItems}        
         columns={columns}
         pagination={pagination}
         onChange={onTableChange}
@@ -519,7 +545,8 @@ const HomePage: React.FC = () =>{
     </EuiFlexGroup>
 
     {isModalVisible &&(
-      <EuiConfirmModal
+      <CommonModal
+     
       aria-labelledby={modalTitleId}
       style={{width:600}}
       title = "Are you sure want to delete this book's details?"
@@ -531,13 +558,13 @@ const HomePage: React.FC = () =>{
       defaultFocusedButton="confirm"
       buttonColor="danger"
       > 
-      <p>This will permantantly delete the book's details.</p></EuiConfirmModal>
+      <p>This will permantantly delete the book's details.</p></CommonModal>
     )}
     {addBookFlyout}
     {flyout}
 
     {isBuyModalVisible && bookTobuy && (
-      <EuiConfirmModal
+      <CommonModal
       title = "Confirm Purchase"
       onCancel={closeBuyModal}
       onConfirm={async()=>{
@@ -548,12 +575,35 @@ const HomePage: React.FC = () =>{
       confirmButtonText = "Buy"
       defaultFocusedButton ="confirm">
         <p>Are you sure you want to buy <strong>{bookTobuy.title}</strong> buy {bookTobuy.author} for <strong>${bookTobuy.price.toFixed(2)}</strong>?</p>
-      </EuiConfirmModal> 
+      </CommonModal> 
     )}
-    <EuiGlobalToastList
+    <CommonToast
      toasts={toasts}
      dismissToast={removeToast}
      toastLifeTimeMs={3000}/>
+
+     {isCartModalVisible && (
+  <CommonFlyout
+    onClose={() => setIsCartModalVisible(false)}
+    size="s"
+    ownFocus
+  >
+    <EuiFlyoutHeader hasBorder>
+      <EuiTitle size="m"><h2>Your Cart</h2></EuiTitle>
+    </EuiFlyoutHeader>
+    <EuiFlyoutBody>
+      {cartItems.length === 0 ? (
+        <p>No items in cart</p>
+      ) : (
+        cartItems.map((item, index) => (
+          <div key={index}>
+            <p><strong>{item.title}</strong> – {item.quantity} pcs</p>
+          </div>
+        ))
+      )}
+    </EuiFlyoutBody>
+  </CommonFlyout>
+)}
 
     </>
   )

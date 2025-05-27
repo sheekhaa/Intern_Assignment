@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { EuiFlexGroup, EuiFlexItem, EuiText, EuiFieldText, EuiButton } from "@elastic/eui";
+import { EuiFlexGroup, EuiFlexItem, EuiText } from "@elastic/eui";
 import { useAddDataMutation } from "../services/loginService";
 import { useNavigate} from "react-router-dom";
-const Login: React.FC=()=>{
+import { CommomButton } from "./button/commonButton";
+import { CommonFieldText } from "./fieldtext/commonFieldText";
 
+const Login: React.FC=()=>{
   const [username, setUsername] = useState('');
   const[password, setPassword] = useState('');
   const [AddLogin] = useAddDataMutation();
@@ -44,8 +46,8 @@ const Login: React.FC=()=>{
             <EuiText>Name:</EuiText>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiFieldText
-            placeholder="Enter username:"  value={username} onChange={(e)=>setUsername(e.target.value)}></EuiFieldText>
+            <CommonFieldText
+            placeholder="Enter username:"  value={username} onChange={(e: { target: { value: React.SetStateAction<string>; }; })=>setUsername(e.target.value)}/>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -53,12 +55,12 @@ const Login: React.FC=()=>{
             <EuiText>Password:</EuiText>
           </EuiFlexItem>
           <EuiFlexItem>
-          <EuiFieldText placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)}></EuiFieldText>
+          <CommonFieldText placeholder="Enter password" value={password} onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setPassword(e.target.value)}/>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup >
           <EuiFlexItem grow = {false}>
-            <EuiButton onClick={handleSubmit}>Login</EuiButton>
+            <CommomButton title="Login" onClick={handleSubmit}/>
           </EuiFlexItem>
         </EuiFlexGroup>
     </>
