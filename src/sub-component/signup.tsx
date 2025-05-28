@@ -10,16 +10,24 @@ const SignUp:React.FC = () =>{
   const [username, setUsername] = useState(''); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [AddSignup] = useAddDataMutation();
-  const [showPassword, setShowPassword] = useState(false);
-
-const togglePasswordVisibility = () => {
-  setShowPassword(!showPassword);
-};
+  
 
 
-
+   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    
+    if (value.length < 8) {
+      setError("Password must be 8 letters");
+    } else {
+      setError("");
+    }
+  };
+  
   const handleSignup = async(e:React.FormEvent)=>{
     e.preventDefault();
 
@@ -41,6 +49,9 @@ const togglePasswordVisibility = () => {
     }   
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return(
     <>
@@ -53,30 +64,35 @@ const togglePasswordVisibility = () => {
       </EuiFlexItem>
     </EuiFlexGroup>
 
-    <EuiFlexGroup >
+    <EuiFlexGroup alignItems="center">
       <EuiFlexItem grow = {false}>
-        <EuiText>Name:</EuiText>
+        <EuiText className="form-label">Name:</EuiText>
       </EuiFlexItem>
       <EuiFlexItem>
         <CommonFieldText placeholder="Enter Username" value={username} onChange={(e: { target: { value: React.SetStateAction<string>; }; })=> setUsername(e.target.value)}/>
       </EuiFlexItem>
     </EuiFlexGroup>
 
-    <EuiFlexGroup>
+    <EuiFlexGroup alignItems="center">
       <EuiFlexItem grow = {false}>
-        <EuiText>Email:</EuiText>
+        <EuiText className="form-label">Email:</EuiText>
       </EuiFlexItem>
       <EuiFlexItem>
-        <CommonFieldText placeholder="Enter email" value={email} onChange={(e: { target: { value: React.SetStateAction<string>; }; })=> setEmail(e.target.value)}/>
+        <CommonFieldText placeholder="Enter email" value={email}
+        
+        onChange={(e: { target: { value: React.SetStateAction<string>; }; })=> setEmail(e.target.value)}/>
       </EuiFlexItem>
     </EuiFlexGroup>
 
-    <EuiFlexGroup>
+    <EuiFlexGroup alignItems="center">
       <EuiFlexItem grow = {false}>
-        <EuiText>Password:</EuiText>
+        <EuiText className="form-label">Password:</EuiText>
       </EuiFlexItem>
       <EuiFlexItem>
-        <CommonFieldText placeholder="Enter password" value={password} onChange={(e: { target: { value: React.SetStateAction<string>; }; })=> setPassword(e.target.value)} />
+        <CommonFieldText placeholder="Enter password" value={password} type = {showPassword ? "text" : "password"} onChange={handlePasswordChange} />
+        {error && <EuiText color="danger" size="xs">{error}</EuiText>}
+          <button 
+          type="button" onClick={togglePasswordVisibility}></button>
       </EuiFlexItem>
     </EuiFlexGroup>
 

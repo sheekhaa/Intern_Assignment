@@ -9,9 +9,6 @@ export interface Book {
   year: number
 }
 
-// Define a type for the tag
-type BookTag = { type: 'Books'; id: 'LIST' | number };
-
 const bookApi = createApi({
   reducerPath: 'bookApi',
   baseQuery: fetchBaseQuery({
@@ -26,11 +23,11 @@ const bookApi = createApi({
   }),
 
   endpoints: (build) => ({
-    // Get books with optional search term
+  
     getBooks: build.query<Book[], string | void>({
       query: (searchTerm) =>
         searchTerm ? `search?query=${searchTerm}` : 'books',
-      // Correctly typed providesTags
+    
       providesTags: (result) =>
         result ? [{ type: 'Books', id: 'LIST' }] : [],
     }),
@@ -52,22 +49,22 @@ const bookApi = createApi({
         url: `books/${id}`,
         method: 'DELETE',
       }),
-      // Invalidate the cache to refetch the book list after deletion
+      
       invalidatesTags: [{ type: 'Books', id: 'LIST' }],
     }),
 
-    // Create a new book
+    
     createBook: build.mutation<Book, Omit<Book, 'id'>>({
       query: (book) => ({
         url: '/books',
         method: 'POST',
         body: book,
       }),
-      // Invalidate the cache to refetch the book list after creation
+     
       invalidatesTags: [{ type: 'Books', id: 'LIST' }],
     }),
 
-    // Buy books (add to cart)
+    
     buyBook: build.mutation<any, { items: Array<{ bookId: number; quantity: number }> }>({
       query: (body) => ({
         url: '/buy',
@@ -77,7 +74,7 @@ const bookApi = createApi({
     }),
   }),
 
-  // Add custom tag type to be used throughout the API
+ 
   tagTypes: ['Books'],
 });
 

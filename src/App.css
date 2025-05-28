@@ -33,6 +33,13 @@
 }
 
 
+.form-label ,css-1n6n1v5-euiText-m{
+  margin-right: 15px;  
+  min-width: 72px; 
+  
+}
+
+
 /* login */
 .login-container ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
   margin: 150px ;

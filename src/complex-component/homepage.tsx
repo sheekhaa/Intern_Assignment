@@ -141,25 +141,25 @@ const onAddToCart = (book: any) => {
   }
 
   //handle edit flyout
-  const handleEdit = async() =>{
-    if(editFlyout){
-      try{
-        await updateBook({
-          id: editFlyout.id,
-          title: editFlyout.title,
-          author: editFlyout.author,
-          year: editFlyout.year,
-          quantity: editFlyout.quantity,
-          price: editFlyout.price
-
-        }).unwrap();
-        setIsFlyoutVisible(false);
-        setEditFlyout(null);
-      }catch(error){
-        console.error("Failed to update book", error);
-      }      
-    }
-  };
+const handleEdit = async() => {
+  if(editFlyout){
+    try {
+     
+      const updatedBook = {
+        ...editFlyout,
+        year: Number(editFlyout.year) || new Date().getFullYear(),
+        quantity: Number(editFlyout.quantity) || 0,
+        price: Number(editFlyout.price) || 0
+      };
+      
+      await updateBook(updatedBook).unwrap();
+      setIsFlyoutVisible(false);
+      setEditFlyout(null);
+    } catch(error) {
+      console.error("Failed to update book", error);
+    }      
+  }
+};
   
 
   const onTableChange = ({page}: Criteria<Book>)=>{
@@ -358,33 +358,48 @@ const onAddToCart = (book: any) => {
 
            <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiText> Year:
-              </EuiText>
+              <EuiText>Year:</EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editFlyout.year} onChange={(e: { target: { value: string; }; })=>setEditFlyout({...editFlyout, year: parseInt(e.target.value)})}/>
+              <CommonFieldText 
+                value={editFlyout.year?.toString() || ''} 
+                onChange={(e: { target: { value: string; }; }) => setEditFlyout({
+                  ...editFlyout, 
+                  year: parseInt(e.target.value) || 0
+                })}
+              />
             </EuiFlexItem>
-          </EuiFlexGroup>    
+          </EuiFlexGroup>  
+
+           <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiText>Quantity:</EuiText>
+              </EuiFlexItem>  
+              <EuiFlexItem>
+                <CommonFieldText 
+                  value={editFlyout.quantity?.toString() || ''} 
+                  onChange={(e: { target: { value: string; }; }) => setEditFlyout({
+                    ...editFlyout, 
+                    quantity: parseInt(e.target.value) || 0
+                  })}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>  
 
            <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiText>Quantitiy:
-              </EuiText>
+              <EuiText>Price:</EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editFlyout.quantity} onChange={(e: { target: { value: string; }; })=> setEditFlyout({...editFlyout, quantity:parseInt(e.target.value)})}/>
+              <CommonFieldText 
+                value={editFlyout.price?.toString() || ''} 
+                onChange={(e: { target: { value: string; }; }) => setEditFlyout({
+                  ...editFlyout, 
+                  price: parseFloat(e.target.value) || 0
+                })}
+              />
             </EuiFlexItem>
-          </EuiFlexGroup>   
-
-           <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText>Price:
-              </EuiText>
-            </EuiFlexItem>  
-            <EuiFlexItem>
-              <CommonFieldText value={editFlyout.price} onChange={(e: { target: { value: string; }; })=> setEditFlyout({...editFlyout, price:parseFloat(e.target.value)})}/>
-            </EuiFlexItem>
-          </EuiFlexGroup>   
+          </EuiFlexGroup>
         </EuiFlyoutBody>
 
         <EuiFlyoutFooter>
