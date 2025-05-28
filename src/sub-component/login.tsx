@@ -41,6 +41,14 @@ const Login: React.FC=()=>{
   }
   return(
     <>
+    <EuiFlexGroup className="login-container">
+      <EuiFlexItem className="login-box">
+        <EuiFlexGroup justifyContent="center">
+              <EuiFlexItem grow = {false}>
+                <EuiText className="login-font">Login</EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+
      <EuiFlexGroup>
           <EuiFlexItem grow = {false}>
             <EuiText>Name:</EuiText>
@@ -59,9 +67,11 @@ const Login: React.FC=()=>{
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup >
-          <EuiFlexItem grow = {false}>
+          <EuiFlexItem grow = {false} className="login-button">
             <CommomButton title="Login" onClick={handleSubmit}/>
-          </EuiFlexItem>
+          </EuiFlexItem>          
+        </EuiFlexGroup>
+        </EuiFlexItem>
         </EuiFlexGroup>
     </>
   )

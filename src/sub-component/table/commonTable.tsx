@@ -17,8 +17,8 @@ export const CommonTable: React.FC<CommonTableProps>=({
 
 })=>{
   return(
-    <>
+    <div className="common-table">
       <EuiBasicTable items={items} columns={columns} loading = {loading} onChange={onChange} pagination={pagination}/>
-    </>
+    </div>
   )
 }

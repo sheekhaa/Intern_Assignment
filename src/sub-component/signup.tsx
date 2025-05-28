@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EuiFlexGroup, EuiFlexItem, EuiText,  EuiLink } from "@elastic/eui";
+import { EuiFlexGroup, EuiFlexItem, EuiText,  EuiLink,  } from "@elastic/eui";
 import { useNavigate } from "react-router-dom";
 import { useAddDataMutation } from "../services/signupService";
 import { CommomButton } from "./button/commonButton";
@@ -12,6 +12,12 @@ const SignUp:React.FC = () =>{
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [AddSignup] = useAddDataMutation();
+  const [showPassword, setShowPassword] = useState(false);
+
+const togglePasswordVisibility = () => {
+  setShowPassword(!showPassword);
+};
+
 
 
   const handleSignup = async(e:React.FormEvent)=>{
@@ -43,11 +49,11 @@ const SignUp:React.FC = () =>{
       
     <EuiFlexGroup justifyContent="center">
       <EuiFlexItem grow = {false}>
-        <EuiText className="font">Sign Up</EuiText>
+        <EuiText className="signup-font">Sign Up</EuiText>
       </EuiFlexItem>
     </EuiFlexGroup>
 
-    <EuiFlexGroup className="form-group" >
+    <EuiFlexGroup >
       <EuiFlexItem grow = {false}>
         <EuiText>Name:</EuiText>
       </EuiFlexItem>
@@ -76,14 +82,14 @@ const SignUp:React.FC = () =>{
 
     <EuiFlexGroup>
       <EuiFlexItem>
-        <EuiText>Already have an account?
+        <EuiText className="signup-text">Already have an account?
           <EuiLink onClick={()=> navigate('/login')}>Login</EuiLink>
         </EuiText>
       </EuiFlexItem>
     </EuiFlexGroup>
 
     <EuiFlexGroup>
-      <EuiFlexItem grow = {false}>
+      <EuiFlexItem className = "signup-button"grow = {false}>
         <CommomButton  title="Signup" onClick={handleSignup}/>
       </EuiFlexItem>      
     </EuiFlexGroup>  

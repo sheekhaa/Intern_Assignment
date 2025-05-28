@@ -57,8 +57,8 @@ const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     title: "",
     author: "",
     year: new Date().getFullYear(),
-    quantity: 0,
-    price: 0 
+    quantity: "",
+    price: "" 
   });
 
 //debouncing
@@ -388,9 +388,9 @@ const onAddToCart = (book: any) => {
         </EuiFlyoutBody>
 
         <EuiFlyoutFooter>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <CommomButton
+          <EuiFlexGroup gutterSize="xl">
+            <EuiFlexItem grow = {false}>
+              <CommomButton color="warning"
               title="Close"
               onClick={()=>{
                 setIsFlyoutVisible(false);
@@ -400,8 +400,8 @@ const onAddToCart = (book: any) => {
               
             </EuiFlexItem>
 
-            <EuiFlexItem>
-              <CommomButton title="update" onClick={handleEdit}/>                
+            <EuiFlexItem grow = {false}>
+              <CommomButton color = "primary"title="update" onClick={handleEdit}/>                
               
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -449,7 +449,7 @@ const onAddToCart = (book: any) => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.year} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, year:parseInt(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.year} onChange={(e: { target: { value: number; }; })=> setEditAddBook({...editAddBook, year:(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -459,7 +459,7 @@ const onAddToCart = (book: any) => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.quantity} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, quantity: parseInt(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.quantity} onChange={(e: { target: { value: number; }; })=> setEditAddBook({...editAddBook, quantity: (e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -469,21 +469,21 @@ const onAddToCart = (book: any) => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.price} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, price:parseFloat(e.target.value)})}/>
+              <CommonFieldText value={editAddBook.price} onChange={(e: { target: { value: number; }; })=> setEditAddBook({...editAddBook, price:(e.target.value)})}/>
             </EuiFlexItem>
           </EuiFlexGroup>        
       </EuiFlyoutBody>
 
       <EuiFlyoutFooter>
-         <EuiFlexGroup>
-           <EuiFlexItem>
-            <CommomButton title="cancel" onClick={()=> setAddBookFlyoutVisible(false)} />
+         <EuiFlexGroup gutterSize="xl">
+           <EuiFlexItem grow = {false}>
+            <CommomButton color="warning" title="cancel" onClick={()=> setAddBookFlyoutVisible(false)} />
 
               
            </EuiFlexItem> 
            
-           <EuiFlexItem >
-            <CommomButton title="Add"             
+           <EuiFlexItem grow = {false}>
+            <CommomButton title="Add"  color="primary"        
             onClick={async()=>{
               try{
                 await createBook(editAddBook).unwrap();
@@ -503,31 +503,30 @@ const onAddToCart = (book: any) => {
    
   return(
     <>
-     <EuiFlexGroup className="">      
-        <EuiText>
+     <EuiFlexGroup className="header" direction="column">      
+        <EuiText className="font">
           <h2>Book List</h2>
         </EuiText>      
     </EuiFlexGroup>
-
-    <EuiFlexGroup>
+    <EuiFlexGroup className="sub-header">
       <EuiFlexItem>
-        <EuiFieldSearch placeholder="Search book" value={searchTerm}onChange={(e)=>{
+        <EuiFieldSearch className="for-search" placeholder="Search book" value={searchTerm}onChange={(e)=>{
           setSearchTerm(e.target.value);
           setPageIndex(0);//reset first page on new search
         }}isClearable></EuiFieldSearch>
       </EuiFlexItem>
-      <EuiFlexItem grow = {true}>
+      <EuiFlexItem className = "cart"grow = {true}>
          <EuiHeaderSectionItemButton onClick={() => setIsCartModalVisible(true)}>
-      <EuiIcon type="shopping-cart" />
+      <EuiText className="cart-font">Cart</EuiText>
       {totalCount > 0 && (
-        <EuiBadge color="accent" style={{ marginLeft: "5px" }}>
+        <EuiBadge color="text" style={{ margin:"0 5px 0 0" }}>
           {totalCount}
         </EuiBadge>
       )}
     </EuiHeaderSectionItemButton>
        
       </EuiFlexItem>
-      <EuiFlexItem>
+      <EuiFlexItem grow ={false}>
         
         <CommomButton title="Add" onClick={()=>setAddBookFlyoutVisible(true)}/>
       </EuiFlexItem>
@@ -574,7 +573,10 @@ const onAddToCart = (book: any) => {
      cancelButtonText= "Cancel"
       confirmButtonText = "Buy"
       defaultFocusedButton ="confirm">
-        <p>Are you sure you want to buy <strong>{bookTobuy.title}</strong> buy {bookTobuy.author} for <strong>${bookTobuy.price.toFixed(2)}</strong>?</p>
+        <p>
+    Are you sure you want to buy <strong>{bookTobuy.title}</strong> by{" "}
+    {bookTobuy.author} for <strong>{bookTobuy.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</strong>?
+  </p>
       </CommonModal> 
     )}
     <CommonToast

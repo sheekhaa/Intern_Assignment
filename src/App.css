@@ -1,12 +1,13 @@
+/* signup */
 .signup-container ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
-  min-height: 75vh;
+  margin: 100px ;
+  min-height: 65vh;
   display: flex;
   justify-content: center;
   align-items: center;  
 }
-
 .signup-box ,css-9sbomz-euiFlexItem-grow-1{  
-  padding: 30px;
+  padding: 15px;
   border-radius: 4px;
   background-color: #fff;
   max-width: 500px; 
@@ -14,17 +15,121 @@
   box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.15) ;
   border-color: transparent;  
 }
-.font.css-1n6n1v5-euiText-m{
+.signup-text.css-1n6n1v5-euiText-m{
+  text-align: center;
+}
+.signup-button ,css-kpsrin-euiFlexItem-growZero{  
+  margin: 0 0 0 170px;  
+}
+.signup-font.css-1n6n1v5-euiText-m{
   margin-bottom: 20px;
   text-align: center;
-  margin: 100px 50px 0 50px;  
+  margin: 10px 50px 1px 50px;  
   font-weight: bold;
 }
-.form-group ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
- 
+.common-Button {
+  display: flex;
+  justify-content: center;
 }
 
-.button.css-aqnt06-euiButtonDisplay-m-defaultMinWidth-base-primary{
-  margin: 0 0 0 20px;  
+
+/* login */
+.login-container ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
+  margin: 150px ;
+  min-height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;  
 }
+.login-box ,css-9sbomz-euiFlexItem-grow-1{
+  padding: 15px;
+  border-radius: 4px;
+  background-color: #fff;
+  max-width: 500px; 
+  margin: 0 auto;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.15) ;
+  border-color: transparent;  
+}
+.login-text.css-1n6n1v5-euiText-m{
+  text-align: center;
+}
+.login-button ,css-kpsrin-euiFlexItem-growZero{  
+  margin: 0 0 0 170px;  
+}
+.login-font.css-1n6n1v5-euiText-m{
+  margin-bottom: 20px;
+  text-align: center;
+  margin: 10px 50px 1px 50px;  
+  font-weight: bold;
+}
+
+/* homepage header */
+
+.header ,css-kz3qdw-euiFlexGroup-l-flexStart-stretch-column{
+  margin: 25px 50px 50px 50px;
+}
+.font.css-1n6n1v5-euiText-m{
+  font-weight: 700;
+  font-size: 28px;
+}
+.sub-header ,css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
+  margin: 25px 25px 25px 25px;
+}
+/* for search */
+.for-search ,css-ins9b-euiFieldSearch{
+  border-radius: 20px ;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.15) !important;
+  border-color: transparent !important;
+}
+.cart-font.css-1n6n1v5-euiText-m{
+  font-size: medium;
+  font-weight: bold;
+}
+/* for Button */
+.common-Button {
+  display: flex;
+  justify-content: center;
+}
+/* .common-Button .css-aqnt06-euiButtonDisplay-m-defaultMinWidth-base-primary{  
+  display: flex;
+  justify-content: center;
+  
+} */
+/* for table*/
+.common-table .css-1drqwgc-euiFlexGroup-responsive-l-flexStart-stretch-row{
+  margin: 0 20px 0 20px !important;
+   border-radius: 12px !important;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.15) !important;
+  border-color: transparent !important;  
+}
+.common-table{
+  margin: 0 20px 0 20px;
+}
+
+
+@media screen and  (max-width: 768px) {
+  .signup-container,
+  .login-container {
+    margin: 50px 30px;
+  }
+  
+  .signup-box,
+  .login-box {
+    max-width: 450px;
+  }
+  
+  .header {
+    margin: 25px 30px !important;
+  }
+  
+  .common-table {
+    margin: 0 15px !important;
+  }
+}
+
+
+
+
+
+
 

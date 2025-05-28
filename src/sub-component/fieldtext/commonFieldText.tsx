@@ -6,6 +6,7 @@ interface CommonFieldTextProps{
   icon?: IconType;
   onChange: any;
   value: string | number ; 
+  
 
 }
 export const CommonFieldText: React.FC<CommonFieldTextProps>=({
