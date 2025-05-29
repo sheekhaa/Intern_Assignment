@@ -4,15 +4,15 @@ export interface Book {
   id: number;
   title: string;
   author: string;
-  price: number | string;
-  quantity: number | string;
+  price: number ;
+  quantity: number ;
   year: number
 }
 
 const bookApi = createApi({
   reducerPath: 'bookApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:3000', // Your API base URL
+    baseUrl: 'http://localhost:3000', 
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('token');
       if (token) {
@@ -43,7 +43,7 @@ const bookApi = createApi({
       invalidatesTags: [{ type: 'Books', id: 'LIST' }],
     }),
 
-    // Delete a book
+   
     deleteBook: build.mutation<void, number>({
       query: (id) => ({
         url: `books/${id}`,

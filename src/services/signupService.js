@@ -3,6 +3,7 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 const SignupService = createApi({
   reducerPath: 'signupService',
   baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:3000'}),
+  tagTypes: ['SignupUser'],
   endpoints: (build) => ({
     addData: build.mutation({
       query: (userData) =>({
@@ -10,6 +11,7 @@ const SignupService = createApi({
         method: 'POST',
         body: userData,
       }),
+      invalidatesTags: ['SignupUser']
     }),
   }),  
 });

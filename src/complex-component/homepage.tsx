@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useGetBooksQuery, useUpdateBookMutation, useDeleteBookMutation, useCreateBookMutation, useBuyBookMutation } from "../services/bookApi";
 import { Book } from "../services/bookApi";
-import { Criteria, EuiBasicTableColumn,  EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiText, EuiPopover, EuiIcon, EuiButtonEmpty, useGeneratedHtmlId,  EuiFlyoutHeader, EuiTitle, EuiFlyoutBody, EuiFlyoutFooter, EuiBadge, EuiHeaderSectionItemButton} from "@elastic/eui";
+import { Criteria, EuiBasicTableColumn,  EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiText, EuiPopover, EuiIcon, EuiButtonEmpty, useGeneratedHtmlId,  EuiFlyoutHeader, EuiTitle, EuiFlyoutBody, EuiFlyoutFooter, EuiBadge, EuiHeaderSectionItemButton, EuiButtonIcon} from "@elastic/eui";
 import { CommomButton } from "../sub-component/button/commonButton";
 import { CommonFieldText } from "../sub-component/fieldtext/commonFieldText";
 import { CommonTable } from "../sub-component/table/commonTable";
@@ -10,14 +10,10 @@ import { CommonModal } from "../sub-component/modal/commonModal";
 import { CommonToast } from "../sub-component/toast/commonToast";
 import { useDispatch,useSelector  } from "react-redux";
 import { RootState } from "../Store";
-import { addToCart } from "../slices/cart/cartSlice";
+import { addToCart, removeFromCart } from "../slices/cart/cartSlice";
 import { MyToast } from "../sub-component/toast/commonToast";
 
-
-
-const HomePage: React.FC = () =>{
-  //for table
-  // const {data: books = [], isLoading} = useGetBooksQuery();
+const HomePage: React.FC = () =>{  
   //for pagination
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, SetPageSize] = useState(4);
@@ -48,17 +44,27 @@ const HomePage: React.FC = () =>{
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
 const cartItems = useSelector((state: RootState) => state.cart.items);
 const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
   
   //for addbookflyout
   const [addBookFlyoutVisible, setAddBookFlyoutVisible] = useState(false);
-  const [editAddBook, setEditAddBook] = useState<Book>({
-    id: 0,
-    title: "",
-    author: "",
-    year: new Date().getFullYear(),
-    quantity: "",
-    price: "" 
+  const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState('');
+  const [author, setAuthor] = useState('');
+  const [authorError, setAuthorError] = useState('');
+  const [year, setYear] = useState('');
+   const [yearError, setYearError] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [quantityError, setQuantityError] = useState('');
+  const [price, setPrice] = useState('');  
+  const [priceError, setPriceError] = useState('');
+
+  //for edit flyout validation
+ const [formErrors, setFormErrors] = useState({   
+    title: '',
+    author: '',
+    year: '',
+    quantity: '',
+    price: '' 
   });
 
 //debouncing
@@ -92,13 +98,13 @@ const removeToast = (removedToast: MyToast) => {
     prevToasts.filter((toast) => toast.id !== removedToast.id)
   );
 };
+
  //for add cart related state
  const dispatch = useDispatch(); 
 const onAddToCart = (book: any) => {
   dispatch(addToCart(book));
   addToast(`${book.title} added to cart`, 'success');
 };
-
 
   //for buy modal
   const closeBuyModal = () =>{
@@ -141,26 +147,84 @@ const onAddToCart = (book: any) => {
   }
 
   //handle edit flyout
-const handleEdit = async() => {
-  if(editFlyout){
-    try {
-     
-      const updatedBook = {
-        ...editFlyout,
-        year: Number(editFlyout.year) || new Date().getFullYear(),
-        quantity: Number(editFlyout.quantity) || 0,
-        price: Number(editFlyout.price) || 0
-      };
-      
-      await updateBook(updatedBook).unwrap();
-      setIsFlyoutVisible(false);
-      setEditFlyout(null);
-    } catch(error) {
-      console.error("Failed to update book", error);
-    }      
-  }
+  const handleEditTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!editFlyout) return;
+  const value = e.target.value;
+  setEditFlyout({...editFlyout, title: value});
+  setFormErrors({
+    ...formErrors,
+    title: validateTitle(value)
+  });
 };
-  
+
+const handleEditAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!editFlyout) return;
+  const value = e.target.value;
+  setEditFlyout({...editFlyout, author: value});
+  setFormErrors({
+    ...formErrors,
+    author: validateAuthor(value)
+  });
+};
+
+const handleEditYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!editFlyout) return;
+  const value = e.target.value;
+  setEditFlyout({
+    ...editFlyout, 
+    year: parseInt(value) || 0
+  });
+  setFormErrors({
+    ...formErrors,
+    year: validateYear(value)
+  });
+};
+
+const handleEditQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!editFlyout) return;
+  const value = e.target.value;
+  setEditFlyout({
+    ...editFlyout, 
+    quantity: parseInt(value) || 0
+  });
+  setFormErrors({
+    ...formErrors,
+    quantity: validateQuantity(value)
+  });
+};
+
+const handleEditPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!editFlyout) return;
+  const value = e.target.value;
+  setEditFlyout({
+    ...editFlyout, 
+    price: parseFloat(value) || 0
+  });
+  setFormErrors({
+    ...formErrors,
+    price: validatePrice(value)
+  });
+};
+
+const handleEdit = async () => {
+  if (!editFlyout) return;  
+  const hasErrors = Object.values(formErrors).some(error => error !== '');  
+  if (hasErrors) {
+    addToast("Please fix the errors before submitting.", "danger");
+    return;
+  }
+
+  try {
+    await updateBook(editFlyout).unwrap();
+    setIsFlyoutVisible(false);
+    setEditFlyout(null);
+    setFormErrors({ title: '', author: '', year: '', quantity: '', price: '' });
+    addToast("Book updated successfully", "success");
+  } catch (error) {
+    console.error('Update failed:', error);
+    addToast("Failed to update book", "danger");
+  }
+}; 
 
   const onTableChange = ({page}: Criteria<Book>)=>{
     if (page){
@@ -319,7 +383,6 @@ const handleEdit = async() => {
 
   //flyout handle for edit
   const simpleFlyoutTitled = useGeneratedHtmlId();
-
   let flyout;
   if(isFlyoutVisible && editFlyout){
     flyout = (
@@ -327,9 +390,10 @@ const handleEdit = async() => {
       ownFocus
       onClose={()=>{ setIsFlyoutVisible(false);
         setEditFlyout(null);
+         setFormErrors({ title: '', author: '', year: '', quantity: '', price: '' });
       }}
       aria-labelledby={simpleFlyoutTitled}
-      size="s">
+      size="m">
         <EuiFlyoutHeader hasBorder>
           <EuiTitle size="s">
             <h2 id = {simpleFlyoutTitled}>A Edit Details</h2>
@@ -342,7 +406,8 @@ const handleEdit = async() => {
               </EuiText>
             </EuiFlexItem>
             <EuiFlexItem>
-              <CommonFieldText value={editFlyout.title} onChange={(e: { target: { value: any; }; })=> setEditFlyout({...editFlyout, title:e.target.value})}/>
+              <CommonFieldText value={editFlyout.title} onChange={handleEditTitleChange}/>
+               {formErrors.title && <EuiText color="danger" size="xs">{formErrors.title}</EuiText>}  
             </EuiFlexItem>
           </EuiFlexGroup>  
 
@@ -352,7 +417,8 @@ const handleEdit = async() => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editFlyout.author} onChange={(e: { target: { value: any; }; })=> setEditFlyout({...editFlyout, author: e.target.value})}/>
+              <CommonFieldText value={editFlyout.author} onChange={handleEditAuthorChange}/>
+               {formErrors.author && <EuiText color="danger" size="xs">{formErrors.author}</EuiText>}  
             </EuiFlexItem>
           </EuiFlexGroup>   
 
@@ -363,11 +429,9 @@ const handleEdit = async() => {
             <EuiFlexItem>
               <CommonFieldText 
                 value={editFlyout.year?.toString() || ''} 
-                onChange={(e: { target: { value: string; }; }) => setEditFlyout({
-                  ...editFlyout, 
-                  year: parseInt(e.target.value) || 0
-                })}
+                onChange={handleEditYearChange}
               />
+              {formErrors.year && <EuiText color="danger" size="xs">{formErrors.year}</EuiText>}
             </EuiFlexItem>
           </EuiFlexGroup>  
 
@@ -378,11 +442,9 @@ const handleEdit = async() => {
               <EuiFlexItem>
                 <CommonFieldText 
                   value={editFlyout.quantity?.toString() || ''} 
-                  onChange={(e: { target: { value: string; }; }) => setEditFlyout({
-                    ...editFlyout, 
-                    quantity: parseInt(e.target.value) || 0
-                  })}
+                  onChange={handleEditQuantityChange}
                 />
+                {formErrors.quantity && <EuiText color="danger" size="xs">{formErrors.quantity}</EuiText>}
               </EuiFlexItem>
             </EuiFlexGroup>  
 
@@ -393,31 +455,27 @@ const handleEdit = async() => {
             <EuiFlexItem>
               <CommonFieldText 
                 value={editFlyout.price?.toString() || ''} 
-                onChange={(e: { target: { value: string; }; }) => setEditFlyout({
-                  ...editFlyout, 
-                  price: parseFloat(e.target.value) || 0
-                })}
+                onChange={handleEditPriceChange}
               />
+               {formErrors.price && <EuiText color="danger" size="xs">{formErrors.price}</EuiText>}
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlyoutBody>
 
         <EuiFlyoutFooter>
           <EuiFlexGroup gutterSize="xl">
-            <EuiFlexItem grow = {false}>
+            <EuiFlexItem >
               <CommomButton color="warning"
               title="Close"
               onClick={()=>{
                 setIsFlyoutVisible(false);
                 setEditFlyout(null);
-              }}/>
-                
-              
+                setFormErrors({ title: '', author: '', year: '', quantity: '', price: '' });
+              }}/>             
             </EuiFlexItem>
 
-            <EuiFlexItem grow = {false}>
+            <EuiFlexItem >
               <CommomButton color = "primary"title="update" onClick={handleEdit}/>                
-              
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlyoutFooter>
@@ -426,14 +484,101 @@ const handleEdit = async() => {
   }
 
   //flyout for add book
+  const validateTitle = (value: string) => {
+  const regex = /^[a-zA-Z0-9\s]*$/; 
+  if (!regex.test(value)) {
+    return "Title can only contain letters, numbers, and spaces.";
+  }
+  return "";
+};
+
+const validateAuthor = (value: string) => {
+  const regex = /^[a-zA-Z\s]*$/; // Only alphabets and spaces
+  if (!regex.test(value)) {
+    return "Author can only contain letters and spaces.";
+  }
+  return "";
+};
+
+const validateYear = (value: string) => {
+  const year = parseInt(value);
+  if (isNaN(year) || year < 1000 || year > new Date().getFullYear()) {
+    return "Please enter a valid year.";
+  }
+  return "";
+};
+
+const validateQuantity = (value: string) => {
+  const quantity = parseInt(value);
+  if (isNaN(quantity) || quantity <= 0) {
+    return "Quantity must be a positive number.";
+  }
+  return "";
+};
+
+const validatePrice = (value: string) => {
+  const price = parseFloat(value);
+  if (isNaN(price) || price <= 0) {
+    return "Price must be a positive number.";
+  }
+  return "";
+};
+
+const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setTitle(value);
+  setTitleError(validateTitle(value));
+};
+
+const handleAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setAuthor(value);
+  setAuthorError(validateAuthor(value));
+};
+
+const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setYear(value);
+  setYearError(validateYear(value));
+};
+
+const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setQuantity(value);
+  setQuantityError(validateQuantity(value));
+};
+
+const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setPrice(value);
+  setPriceError(validatePrice(value));
+};
+
+const handleAddBook = () => {
+  if (titleError || authorError || yearError || quantityError || priceError) {   
+    addToast("Please fix the errors before submitting.", "danger");
+    return;
+  }
+  
+  createBook({
+    title,
+    author,
+    year: parseInt(year),
+    quantity: parseInt(quantity),
+    price: parseFloat(price),
+  }).unwrap();
+  addToast("Book added successfully", "success");
+  setAddBookFlyoutVisible(false); // Close flyout
+}; 
+
   const addBookFlyout =  addBookFlyoutVisible && (
     <CommonFlyout
     ownFocus
     onClose={()=> setAddBookFlyoutVisible(false)}
-    size= "s"
+    size= "m"
     arialabelledby="addBookFlyoutTitle">
       <EuiFlyoutHeader  hasBorder>
-        <EuiTitle size="s">
+        <EuiTitle size="m">
           <h2 id="addBookFlyoutTitle"> Add new Book</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
@@ -444,7 +589,8 @@ const handleEdit = async() => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.title} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, title:(e.target.value)})}/>
+              <CommonFieldText value={title} onChange={handleTitleChange}/>
+               {titleError && <EuiText color="danger" size="xs">{titleError}</EuiText>}
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -454,7 +600,8 @@ const handleEdit = async() => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.author} onChange={(e: { target: { value: string; }; })=> setEditAddBook({...editAddBook, author:(e.target.value)})}/>
+              <CommonFieldText value={author} onChange={handleAuthorChange}/>
+              {authorError && <EuiText color="danger" size="xs">{authorError}</EuiText>}
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -464,7 +611,8 @@ const handleEdit = async() => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.year} onChange={(e: { target: { value: number; }; })=> setEditAddBook({...editAddBook, year:(e.target.value)})}/>
+              <CommonFieldText value={year} onChange={handleYearChange}/>
+              {yearError && <EuiText color="danger" size="xs">{yearError}</EuiText>}
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -474,7 +622,8 @@ const handleEdit = async() => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.quantity} onChange={(e: { target: { value: number; }; })=> setEditAddBook({...editAddBook, quantity: (e.target.value)})}/>
+              <CommonFieldText value={quantity} onChange={handleQuantityChange}/>
+              {quantityError && <EuiText color="danger" size="xs">{quantityError}</EuiText>}
             </EuiFlexItem>
           </EuiFlexGroup> 
 
@@ -484,31 +633,20 @@ const handleEdit = async() => {
               </EuiText>
             </EuiFlexItem>  
             <EuiFlexItem>
-              <CommonFieldText value={editAddBook.price} onChange={(e: { target: { value: number; }; })=> setEditAddBook({...editAddBook, price:(e.target.value)})}/>
+              <CommonFieldText value={price} onChange={handlePriceChange}/>
+              {priceError && <EuiText color="danger" size="xs">{priceError}</EuiText>}
             </EuiFlexItem>
           </EuiFlexGroup>        
       </EuiFlyoutBody>
 
       <EuiFlyoutFooter>
          <EuiFlexGroup gutterSize="xl">
-           <EuiFlexItem grow = {false}>
-            <CommomButton color="warning" title="cancel" onClick={()=> setAddBookFlyoutVisible(false)} />
-
-              
-           </EuiFlexItem> 
-           
-           <EuiFlexItem grow = {false}>
+           <EuiFlexItem >
+            <CommomButton color="warning" title="cancel" onClick={()=> setAddBookFlyoutVisible(false)} />              
+           </EuiFlexItem>            
+           <EuiFlexItem >
             <CommomButton title="Add"  color="primary"        
-            onClick={async()=>{
-              try{
-                await createBook(editAddBook).unwrap();
-                setAddBookFlyoutVisible(false);
-                setEditAddBook({id: 0, title: '', author: '', year: new Date().getFullYear(), quantity: 1, price: 0});
-              }catch(error){
-                console.error("Failed to create book", error);
-              }
-            }}/>
-              
+            onClick= {handleAddBook}/>        
 
            </EuiFlexItem>
          </EuiFlexGroup> 
@@ -599,34 +737,75 @@ const handleEdit = async() => {
      dismissToast={removeToast}
      toastLifeTimeMs={3000}/>
 
-     {isCartModalVisible && (
+    {/* Add to Cart flyout */}
+{isCartModalVisible && (
   <CommonFlyout
     onClose={() => setIsCartModalVisible(false)}
     size="s"
     ownFocus
   >
     <EuiFlyoutHeader hasBorder>
-      <EuiTitle size="m"><h2>Your Cart</h2></EuiTitle>
+      <EuiTitle size="m"><h5>Your Cart ({totalCount} items)</h5></EuiTitle>
     </EuiFlyoutHeader>
+   
     <EuiFlyoutBody>
       {cartItems.length === 0 ? (
         <p>No items in cart</p>
-      ) : (
-        cartItems.map((item, index) => (
-          <div key={index}>
-            <p><strong>{item.title}</strong> – {item.quantity} pcs</p>
-          </div>
-        ))
+      ) : (        
+        <EuiFlexGroup direction="column" gutterSize="xl">
+          {cartItems.map((item, index) => (
+            <EuiFlexItem key={index}>
+              <EuiFlexGroup >
+                {/* Book Info */}
+                <EuiFlexItem grow={true}>
+                  <EuiText>
+                    <p>{item.title} by {item.author}</p>
+                  </EuiText>
+                </EuiFlexItem>
+                </EuiFlexGroup>
+
+                {/* Quantity */}
+                <EuiFlexGroup>
+                <EuiFlexItem grow={false}>
+                  <EuiText>
+                    <p>Qty: {item.quantity}</p>
+                  </EuiText>
+                </EuiFlexItem>
+                </EuiFlexGroup>
+
+                {/* Price */}
+                <EuiFlexGroup>
+                <EuiFlexItem grow={false}>
+                  <EuiText>
+                    <p>Price: ${(item.price * item.quantity).toFixed(2)}</p>
+                  </EuiText>
+                </EuiFlexItem>
+                </EuiFlexGroup>  
+
+                
+                <EuiFlexItem grow={true}>
+                  <EuiButtonIcon 
+                    iconType="trash"
+                    color="danger"
+                    aria-label="Remove item"
+                    onClick={() => {
+                      dispatch(removeFromCart(item.id));
+                      addToast(`${item.title} removed from cart`, 'warning');
+                    }}
+                  />
+                </EuiFlexItem>             
+            </EuiFlexItem>
+          ))}
+        </EuiFlexGroup>
+       
       )}
     </EuiFlyoutBody>
+    
+  
   </CommonFlyout>
 )}
-
     </>
   )
 }
 export default HomePage;
-// function useToast(): { addToast: any; toasts: any; removeToast: any; } {
-//   throw new Error("Function not implemented.");
-// }
 

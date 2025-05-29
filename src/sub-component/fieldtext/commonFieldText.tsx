@@ -7,6 +7,8 @@ interface CommonFieldTextProps{
   onChange: any;
   value: string | number ; 
   type?: string
+  isInvalid?: boolean;
+  error?: string
 
 }
 export const CommonFieldText: React.FC<CommonFieldTextProps>=({
@@ -14,12 +16,15 @@ export const CommonFieldText: React.FC<CommonFieldTextProps>=({
   icon,
   onChange,
   value,
-  type
+  type,
+  isInvalid,
+  error,
 
 })=>{
   return(
     <>
-      <EuiFieldText placeholder = {placeholder} icon = {icon} onChange = {onChange} value = {value} type={type} >
+      <EuiFieldText placeholder = {placeholder} icon = {icon} onChange = {onChange} value = {value} type={type}
+      isInvalid = {isInvalid} >
         </EuiFieldText> 
     </>
   )

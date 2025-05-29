@@ -18,13 +18,19 @@ const Login: React.FC=()=>{
         const value = e.target.value;
         setPassword(value);
         
-        if (value.length < 8) {
-          setError("Password must be 8 letters");
-        } else {
-          setError("");
-        }
-      };
+     //validation check
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value); 
+    const hasMinLength = value.length>=8;
 
+    if (!hasMinLength) {
+      setError("Password must be at least 8 letters");
+    } else if (!hasSpecialChar){
+      setError("Password must include at least 1 special character.");
+    }else {
+      setError("");
+    } 
+  };
+  
     const handleSubmit = async(e: React.FormEvent) =>{
     e.preventDefault();
 
