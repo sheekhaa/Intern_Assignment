@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import SignupService from "./services/signupService";
 import LoginService from "./services/loginService";
 import bookApi from "./services/bookApi";
-import cartReducer from "./slices/cart/cartSlice"
+import cartReducer from "./slices/cartSlice"
 
 
 const store = configureStore({

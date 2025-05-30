@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { EuiFlexGroup, EuiFlexItem, EuiText,  EuiLink,  } from "@elastic/eui";
 import { useNavigate } from "react-router-dom";
-import { useAddDataMutation } from "../services/signupService";
+import { useAddDataMutation } from "../redux/services/signupService";
 import { CommomButton } from "./button/commonButton";
 import { CommonFieldText } from "./fieldtext/commonFieldText";
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useGetBooksQuery, useUpdateBookMutation, useDeleteBookMutation, useCreateBookMutation, useBuyBookMutation } from "../services/bookApi";
-import { Book } from "../services/bookApi";
+import { useGetBooksQuery, useUpdateBookMutation, useDeleteBookMutation, useCreateBookMutation, useBuyBookMutation } from "../redux/services/bookApi";
+import { Book } from "../redux/services/bookApi";
 import { Criteria, EuiBasicTableColumn,  EuiFieldSearch, EuiFlexGroup, EuiFlexItem, EuiText, EuiPopover, EuiIcon, EuiButtonEmpty, useGeneratedHtmlId,  EuiFlyoutHeader, EuiTitle, EuiFlyoutBody, EuiFlyoutFooter, EuiBadge, EuiHeaderSectionItemButton, EuiButtonIcon} from "@elastic/eui";
 import { CommomButton } from "../sub-component/button/commonButton";
 import { CommonFieldText } from "../sub-component/fieldtext/commonFieldText";
@@ -9,8 +9,8 @@ import { CommonFlyout } from "../sub-component/flyout/commonFlyout";
 import { CommonModal } from "../sub-component/modal/commonModal";
 import { CommonToast } from "../sub-component/toast/commonToast";
 import { useDispatch,useSelector  } from "react-redux";
-import { RootState } from "../Store";
-import { addToCart, removeFromCart } from "../slices/cart/cartSlice";
+import { RootState } from "../redux/Store";
+import { addToCart, removeFromCart } from "../redux/slices/cartSlice";
 import { MyToast } from "../sub-component/toast/commonToast";
 
 const HomePage: React.FC = () =>{  
@@ -487,7 +487,7 @@ const handleEdit = async () => {
   const validateTitle = (value: string) => {
   const regex = /^[a-zA-Z0-9\s]*$/; 
   if (!regex.test(value)) {
-    return "Title can only contain letters, numbers, and spaces.";
+    return "Title can only contain letters, numbers and spaces.";
   }
   return "";
 };

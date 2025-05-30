@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiText } from "@elastic/eui";
-import { useAddDataMutation } from "../services/loginService";
+import { useAddDataMutation } from "../redux/services/loginService";
 import { useNavigate} from "react-router-dom";
 import { CommomButton } from "./button/commonButton";
 import { CommonFieldText } from "./fieldtext/commonFieldText";
